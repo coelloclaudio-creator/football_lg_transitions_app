@@ -1,0 +1,52 @@
+import pandas as pd
+import streamlit as st
+
+st.header("Glossary")
+st.subheader('What was done in this project?')
+
+paragraph = """
+This project is meant to read statsbomb data for player seasons. In this case, we started with a csv that contains 5 seasons worth of data, from 2019 to 2024. 
+
+Our first task was to build a table that for each row, contained 2 consecutive seasons worth of data for each player. These two seasons, ‘current’ and ‘previous’, were compared to find the differences in performance in 10 key statistics. 
+- Deep progressions
+- Key passes 
+- Non-penalty expected goals
+- Expected goals + expected assists
+- Post shot expected goals (shooting)
+- Pass adjusted tackles and interceptions
+- Expected assists
+- Line breaking passes completed
+- On ball value
+- Turnovers.
+All of these are measured per 90 minutes
+
+These consecutive seasons often mean the players moved between leagues. These league transitions were compiled into buckets of identical transitions. For example, we found all of the players that moved from Bundesliga to Eredivisie in these 5 seasons. Then, we found the average difference in performance in the key statistics mentioned above, and created a matrix where the observed rise or decrease in output is shown.
+
+**What about transitions that were not observed, or only happened in small numbers?**
+
+
+The whole point of this project was to find a way to predict what would happen to player performance when players moved from one league to a league where players had not often moved to in the past.
+We “filled in the missing value” by using a formula that takes observed intermediate transitions, and finds the influence from one league to all the others by implementing a Random Walk with Restart, with a restart probability of 0.15, and the rest of the probability being calculated by the number of transitions that happened from the origin league to all possible destinations.
+
+For example, if we were trying to predict the change in performance for a player moving from Bundesliga to Liga MX, but this transition had never happened in the past, we would use all the intermediate transitions that might have happened. Say a lot of players move from Bundesliga to Eredivisie, and from Eredivisie to Liga MX. Our formula would use the statistical change observed, and the value of the influences between Bundesliga, Eredivise, and Liga MX to derive the “predicted” change.
+In practice, our formula uses the influence values from ALL intermediate “nodes” in the transition path, so this process is repeated multiple times.
+
+The formula that is used to find the predicted value is as follows:
+- In the numerator: the value of the observed intermediate changes, times the influence of the intermediate nodes.
+- In the denominator: the influence of the intermediate nodes.
+These influence values are collected from the Random Walk with Restart.
+
+In the app, the original matrix, with no predicted values, as well as the one with predicted values, are displayed, to show which transitions have been observed, and which ones are being projected.
+
+"""
+st.markdown(paragraph)
+
+st.subheader('Contact the App Developer')
+
+st.write('Claudio Coello. Data science student at the University of Florida.')
+st.markdown('LinkedIn: [Claudio Coello] (www.linkedin.com/in/claudiocoello)')
+st.write('Email: coelloclaudio@gmail.com')
+
+st.subheader('Special thank you to Santiago Fernandez del Castillo for his guidance during this project.')
+st.markdown('LinkedIn: [Santiago Fernandez del Castillo] (https://www.linkedin.com/in/santiago-fern%C3%A1ndez-del-castillo-sodi-8471401b4/)')
+
