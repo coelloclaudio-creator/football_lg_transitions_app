@@ -18,7 +18,8 @@ Our first task was to build a table that for each row, contained 2 consecutive s
 - Line breaking passes completed
 - On ball value
 - Turnovers.
-All of these are measured per 90 minutes
+
+ All of these are measured per 90 minutes
 
 These consecutive seasons often mean the players moved between leagues. These league transitions were compiled into buckets of identical transitions. For example, we found all of the players that moved from Bundesliga to Eredivisie in these 5 seasons. Then, we found the average difference in performance in the key statistics mentioned above, and created a matrix where the observed rise or decrease in output is shown.
 
