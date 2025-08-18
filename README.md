@@ -39,7 +39,8 @@ The app is organized into three pages:
 - Page 3 – Glossary and explanations
 
 The data/ folder is used to temporarily store uploaded data (raw/) and processed data (processed/).
-Important: To protect privacy, data inside data/raw/ and data/processed/ is deleted once a session ends. Do not commit real player data to the repository.
+
+### Important: To protect privacy, data inside data/raw/ and data/processed/ is deleted once a session ends. Do not commit real player data to the repository.
 
 ## Step 0) Environment installation:
 
