@@ -41,27 +41,27 @@ The app is organized into three pages:
 The data/ folder is used to temporarily store uploaded data (raw/) and processed data (processed/).
 Important: To protect privacy, data inside data/raw/ and data/processed/ is deleted once a session ends. Do not commit real player data to the repository.
 
-# Step 0) Environment installation:
+## Step 0) Environment installation:
 
 This project requires Python 3.10+. After cloning the repository and moving into the project root:
 
 0.1 Create a virtual environment
 
-conda create -n football_env python=3.10
+`conda create -n football_env python=3.10`
 
-conda activate football_env
+`conda activate football_env`
 
 0.2 Install dependencies
 
-pip install -r requirements.txt
+`pip install -r requirements.txt`
 
-# Step 1) Run the App:
+## Step 1) Run the App:
 
-streamlit run league_transitions_app.py
+`streamlit run league_transitions_app.py`
 
 Wait a few seconds. You’ll see a local URL in your terminal that you can click to open the app in your browser.
 
-# Step 2) Uploading Data:
+## Step 2) Uploading Data:
 
 On the landing page (Page 1), upload your CSV files:
 
@@ -73,7 +73,7 @@ The app will preprocess your data and generate preview tables automatically.
 
 ! Use Statsbomb data to be guaranteed this app will work.
 
-# Step 3) Use the App
+## Step 3) Use the App
 
 Go to page 2 to build the transition matrices and pass filters on age and position to create more focused matrices.
 Click on the "fill missing values from influence matrix" button to see the imputation of missing values.
