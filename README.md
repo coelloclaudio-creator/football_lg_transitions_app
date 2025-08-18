@@ -26,4 +26,60 @@ Using this back to back season table, we compiled all of the players who had ide
 
 Many transitions were either not observed, or happened in small numbers, so the point of this project was to find a way to predict these missing values using all the transitions that we had in our data. 
 
-We
+We used a formula, and numpy linear algebra functions, to find the influence of an origin league (eg. Bundesliga) on other destination leagues when players transfer to a new competition. The full process of the imputation of values is commented in the app's glossary.
+
+# Streamlit app
+
+The app is organized into three pages:
+
+- Page 1 – Upload CSV data (player stats and optional catalogs)
+
+- Page 2 – Transition & influence matrices
+
+- Page 3 – Glossary and explanations
+
+The data/ folder is used to temporarily store uploaded data (raw/) and processed data (processed/).
+Important: To protect privacy, data inside data/raw/ and data/processed/ is deleted once a session ends. Do not commit real player data to the repository.
+
+# Step 0) Environment installation:
+
+This project requires Python 3.10+. After cloning the repository and moving into the project root:
+
+0.1 Create a virtual environment
+
+conda create -n football_env python=3.10
+
+conda activate football_env
+
+0.2 Install dependencies
+
+pip install -r requirements.txt
+
+# Step 1) Run the App:
+
+streamlit run league_transitions_app.py
+
+Wait a few seconds. You’ll see a local URL in your terminal that you can click to open the app in your browser.
+
+# Step 2) Uploading Data:
+
+On the landing page (Page 1), upload your CSV files:
+
+Player Stats CSV (required)
+
+Player Catalog, Team Catalog, Player Season Catalog CSVs (optional)
+
+The app will preprocess your data and generate preview tables automatically.
+
+! Use Statsbomb data to be guaranteed this app will work.
+
+# Step 3) Use the App
+
+Go to page 2 to build the transition matrices and pass filters on age and position to create more focused matrices.
+Click on the "fill missing values from influence matrix" button to see the imputation of missing values.
+
+Visit page 3 to read the glossary on key terms, definitions, and formulas.
+
+
+
+  
