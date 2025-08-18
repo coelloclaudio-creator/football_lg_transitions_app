@@ -72,7 +72,7 @@ Player Catalog, Team Catalog, Player Season Catalog CSVs (optional)
 
 The app will preprocess your data and generate preview tables automatically.
 
-! Use Statsbomb data to be guaranteed this app will work.
+### ! Use Statsbomb data to be guaranteed this app will work.
 
 ## Step 3) Use the App
 
