@@ -164,6 +164,12 @@ def populate_custom_matrix (df, stat_columns, template_matrix, age_group= None, 
     if primary_position and 'All' not in primary_position:
         df_filtered = df_filtered[df_filtered['primary_position'].isin(primary_position)]
 
+     # League inclusion filter
+    if excluded_leagues:
+        df_filtered = df_filtered[~df_filtered['competition_name'].isin(excluded_leagues)]
+        template_matrix = template_matrix.drop(index=excluded_leagues, errors='ignore')
+        template_matrix = template_matrix.drop(columns=excluded_leagues, errors='ignore')
+
     return populate_matrix(df_filtered, stat_columns, template_matrix)
 
 def transition_count_matrix (df, template_matrix):
