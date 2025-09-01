@@ -39,6 +39,10 @@ original_matrix = populate_matrix(pivot_df, [selected_stat], template_matrix)
 st.subheader(f'Original Matrix for {selected_stat} (NaN values mean transition not observed)')
 st.dataframe(style_matrix(original_matrix[selected_stat]))
 
+league_exclusion = st.multiselect('Exclude Leagues from Matrix (optional)', options=['All'] + sorted(pivot_df['competition_name'].dropna().unique().tolist()),
+    default='All')
+excluded_leagues = [] if 'All' in league_exclusion else league_exclusion
+
 age_group_selection = st.multiselect('Select Age Group(s) (optional)', options= ['All'] +sorted(pivot_df['age_group'].dropna().unique().tolist()),
                                     default='All')
 age_group = None if 'All' in age_group_selection else age_group_selection
