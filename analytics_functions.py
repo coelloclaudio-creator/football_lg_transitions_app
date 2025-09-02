@@ -1,3 +1,4 @@
+
 import re
 import numpy as np
 import pandas as pd
@@ -166,12 +167,6 @@ def populate_custom_matrix (df, stat_columns, template_matrix, age_group= None, 
     if primary_position and 'All' not in primary_position:
         df_filtered = df_filtered[df_filtered['primary_position'].isin(primary_position)]
 
-     # League inclusion filter
-    if excluded_leagues:
-        df_filtered = df_filtered[~df_filtered['competition_name'].isin(excluded_leagues)]
-        template_matrix = template_matrix.drop(index=excluded_leagues, errors='ignore')
-        template_matrix = template_matrix.drop(columns=excluded_leagues, errors='ignore')
-
     return populate_matrix(df_filtered, stat_columns, template_matrix)
 
 def transition_count_matrix (df, template_matrix):
@@ -211,13 +206,13 @@ def build_rs_matrix(df, template_matrix, alpha=0.15, min_count=10, power=1):
         idx = count_matrix.index[dangling]
         prob_matrix.loc[idx, idx] = 1.0
 
-    # 4) Potencia de P (opcional) para incorporar pasos multi-salto antes del restart
+    # 4) Potencia de P para incorporar pasos multi-salto antes del restart
     matrix_powered = np.linalg.matrix_power(prob_matrix.to_numpy(), power)
 
     # 5) RWR en forma de vector-fila:
     #    r_s = α e_s (I - (1-α) P^power)^{-1}
     #    => La matriz R = α (I - (1-α) P^power)^{-1}
-    #    y la FILA s de R es r_s (coincide con rs_df.loc[origin] en tu imputación)
+    #    y la FILA s de R es r_s
     identity = np.eye(len(template_matrix))
     M = identity - (1 - alpha) * matrix_powered
     M_inv = np.linalg.inv(M)
@@ -283,4 +278,3 @@ def style_matrix(df):
         else:  # val < 0
             return 'background-color: red; color: white;'
     return df.style.applymap(color_values).format("{:.4f}")
-
