@@ -51,7 +51,7 @@ position_selection = st.multiselect('Select Primary Position (optional)', option
                                     default='All')
 primary_position = None if 'All' in position_selection else position_selection
 
-custom_matrix = populate_custom_matrix(pivot_df, [selected_stat], template_matrix, age_group= age_group, primary_position= primary_position)
+custom_matrix = populate_custom_matrix(pivot_df, [selected_stat], template_matrix, age_group= age_group, primary_position= primary_position, excluded_leagues=excluded_leagues)
 st.dataframe(style_matrix(custom_matrix[selected_stat]))
 
 rs_df = build_rs_matrix(pivot_df, template_matrix, alpha=0.15, min_count=10, power=1)
