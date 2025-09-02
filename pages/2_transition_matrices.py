@@ -1,7 +1,7 @@
 import pandas as pd 
 import numpy as np
 import streamlit as st
-from analytics_functions_test import load_data, add_player_age, filter_players, find_age_group, filter_stats, \
+from analytics_functions import load_data, add_player_age, filter_players, find_age_group, filter_stats, \
     find_prev_season, find_prev_stat, create_pivot_df, create_template_matrix, find_stat_diff, populate_matrix,\
     populate_custom_matrix, transition_count_matrix, build_rs_matrix, fill_missing_values_from_influence, style_matrix
 
