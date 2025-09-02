@@ -55,11 +55,16 @@ custom_matrix = populate_custom_matrix(pivot_df, [selected_stat], template_matri
 st.dataframe(style_matrix(custom_matrix[selected_stat]))
 
 rs_df = build_rs_matrix(pivot_df, template_matrix, alpha=0.15, min_count=10, power=1)
+
+counts = transition_count_matrix(pivot_df, template_matrix)
+
 st.session_state.rs_df = rs_df
 
 if st.button('Fill Missing Values from Influence Matrix'):
+
+
     filled_matrices = fill_missing_values_from_influence(matrices ={selected_stat: custom_matrix[selected_stat]},
-                                                         rs_df = st.session_state.rs_df)
+                                                         rs_df = st.session_state.rs_df, count_matrix=counts)
     
     filled_matrix = filled_matrices[selected_stat]
 
