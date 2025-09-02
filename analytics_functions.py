@@ -1,5 +1,7 @@
-import pandas as pd
+import re
 import numpy as np
+import pandas as pd
+
 def load_data(player_stats_file, player_catalog_file, team_catalog_file, player_season_catalog_file):
     df = pd.read_csv(player_stats_file)
 
@@ -187,61 +189,86 @@ def transition_count_matrix (df, template_matrix):
                 count_matrix.at[origin, destination] = count_dict[key]
     return count_matrix
 
-def build_rs_matrix(df, template_matrix, alpha=0.15, min_count=10, power=1): # combine 4 functions into 1 influence matrix
-    # Build powered transition matrix once
+def build_rs_matrix(df, template_matrix, alpha=0.15, min_count=10, power=1):
+    # 1) Conteos por (origen, destino) con umbral
     transition_count = df.groupby(['competition_name_prev', 'competition_name']).size()
     filtered_count = transition_count[transition_count >= min_count]
 
+    # 2) Matriz de conteos en el orden de template_matrix
     count_matrix = template_matrix.copy().astype(float)
     for (origin, destination), count in filtered_count.items():
         count_matrix.at[origin, destination] = count
+    count_matrix = count_matrix.fillna(0.0)
 
-    prob_matrix = count_matrix.div(count_matrix.sum(axis=1), axis=0).fillna(0)
+    # 3) Normalización por filas + FIX de "dangling rows" (self-loops)
+    #    => Aseguramos que P sea estocástica por filas (cada fila suma 1)
+    row_sums = count_matrix.sum(axis=1)
+    prob_matrix = count_matrix.div(row_sums.replace(0, np.nan), axis=0).fillna(0.0)
+
+    # Filas sin salidas (sum=0) -> self-loop para respetar propiedad de Markov
+    dangling = (row_sums == 0)
+    if dangling.any():
+        idx = count_matrix.index[dangling]
+        prob_matrix.loc[idx, idx] = 1.0
+
+    # 4) Potencia de P (opcional) para incorporar pasos multi-salto antes del restart
     matrix_powered = np.linalg.matrix_power(prob_matrix.to_numpy(), power)
-    matrix_scaled_restart = (1 - alpha) * matrix_powered #rwr
 
-    # Identity minus P_t
+    # 5) RWR en forma de vector-fila:
+    #    r_s = α e_s (I - (1-α) P^power)^{-1}
+    #    => La matriz R = α (I - (1-α) P^power)^{-1}
+    #    y la FILA s de R es r_s (coincide con rs_df.loc[origin] en tu imputación)
     identity = np.eye(len(template_matrix))
-    M = identity - matrix_scaled_restart
-
-    # Precompute inverse once
+    M = identity - (1 - alpha) * matrix_powered
     M_inv = np.linalg.inv(M)
 
-    # e_s vectors are  identity rows np.eye()
     leagues = list(template_matrix.index)
     rs_df = pd.DataFrame(alpha * M_inv, index=leagues, columns=leagues)
-
+    
     return rs_df
 
-def fill_missing_values_from_influence(matrices, rs_df):
-    
+
+def fill_missing_values_from_influence(matrices, rs_df, count_matrix=None):
+ 
     filled_matrices = {}
     leagues = matrices[next(iter(matrices))].index
 
-    # Ensure rs_df order matches league order
+    # Alinear orden
     rs_df = rs_df.loc[leagues, leagues]
+    if count_matrix is not None:
+        count_matrix = count_matrix.reindex(index=leagues, columns=leagues).fillna(0.0)
 
     for stat, matrix in matrices.items():
         filled_matrix = matrix.copy()
 
         for origin in leagues:
-            r_s = rs_df.loc[origin]
+            r_s = rs_df.loc[origin]  # fila r(s)
 
             for destination in leagues:
                 if pd.isna(filled_matrix.at[origin, destination]):
 
-                    intermediate_info = {
-                        k: (r_s[k], matrix.at[k, destination])
-                        for k in leagues
-                        if k != origin and k != destination and pd.notna(matrix.at[k, destination])
-                    }
+                    # k útiles: con Δ(k->t) observada y k != s,t
+                    valid_k = [
+                        k for k in leagues
+                        if (k != origin) and (k != destination) and pd.notna(matrix.at[k, destination])
+                    ]
 
-                    if intermediate_info:
-                        numer = sum(infl * val for infl, val in intermediate_info.values())
-                        denom = sum(infl for infl, _ in intermediate_info.values())
+                    if valid_k:
+                        # Pesos: r_s[k] * (conteo k->t si está disponible)
+                        if count_matrix is not None:
+                            weights = pd.Series(
+                                [r_s[k] * float(count_matrix.at[k, destination]) for k in valid_k],
+                                index=valid_k
+                            )
+                        else:
+                            weights = r_s[valid_k].copy()
 
+                        # Valores Δ(k->t)
+                        vals = pd.Series([matrix.at[k, destination] for k in valid_k], index=valid_k)
+
+                        denom = weights.sum()
                         if denom > 0:
-                            filled_matrix.at[origin, destination] = numer / denom
+                            filled_matrix.at[origin, destination] = float((weights * vals).sum() / denom)
 
         filled_matrices[stat] = filled_matrix
 

@@ -1,7 +1,7 @@
 import pandas as pd 
 import numpy as np
 import streamlit as st
-from analytics_functions import load_data, add_player_age, filter_players, find_age_group, filter_stats, \
+from analytics_functions_test import load_data, add_player_age, filter_players, find_age_group, filter_stats, \
     find_prev_season, find_prev_stat, create_pivot_df, create_template_matrix, find_stat_diff, populate_matrix,\
     populate_custom_matrix, transition_count_matrix, build_rs_matrix, fill_missing_values_from_influence, style_matrix
 
@@ -55,11 +55,16 @@ custom_matrix = populate_custom_matrix(pivot_df, [selected_stat], template_matri
 st.dataframe(style_matrix(custom_matrix[selected_stat]))
 
 rs_df = build_rs_matrix(pivot_df, template_matrix, alpha=0.15, min_count=10, power=1)
+
+counts = transition_count_matrix(pivot_df, template_matrix)
+
 st.session_state.rs_df = rs_df
 
 if st.button('Fill Missing Values from Influence Matrix'):
+
+
     filled_matrices = fill_missing_values_from_influence(matrices ={selected_stat: custom_matrix[selected_stat]},
-                                                         rs_df = st.session_state.rs_df)
+                                                         rs_df = st.session_state.rs_df, count_matrix=counts)
     
     filled_matrix = filled_matrices[selected_stat]
 
